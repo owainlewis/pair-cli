@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
+	"github.com/owainlewis/pair-cli/internal/api"
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +52,10 @@ func Execute(args []string, stdout, stderr io.Writer) int {
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Fprintln(stderr, err)
+		var apiErr *api.APIError
+		if errors.As(err, &apiErr) {
+			return 2
+		}
 		return 1
 	}
 
