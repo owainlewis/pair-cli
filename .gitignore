@@ -29,6 +29,7 @@ go.work.sum
 
 # Local CLI build artifact
 /pair
+/dist/
 
 # Editor/IDE
 # .idea/
