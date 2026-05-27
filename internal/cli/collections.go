@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/owainlewis/pair-cli/internal/api"
 	"github.com/owainlewis/pair-cli/internal/output"
@@ -142,7 +141,7 @@ func newCollectionsPublishCommand(opts *Options) *cobra.Command {
 		Short: "Create and link a document to a collection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			markdown, err := ReadMarkdownInput(body, file, os.Stdin)
+			markdown, err := ReadMarkdownInput(body, file, opts.Stdin)
 			if err != nil {
 				return err
 			}
@@ -171,7 +170,7 @@ func newCollectionsUnlinkDocCommand(opts *Options) *cobra.Command {
 		Short: "Unlink a document from a collection",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := ConfirmDestructive(yes, os.Stdin, cmd.ErrOrStderr(), "Unlink document "+args[1]+" from collection "+args[0]+"?"); err != nil {
+			if err := ConfirmDestructive(yes, opts.Stdin, cmd.ErrOrStderr(), "Unlink document "+args[1]+" from collection "+args[0]+"?"); err != nil {
 				return err
 			}
 			client, err := newAPIClient(opts)
@@ -197,7 +196,7 @@ func newCollectionsDeleteCommand(opts *Options) *cobra.Command {
 		Short: "Delete a collection",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := ConfirmDestructive(yes, os.Stdin, cmd.ErrOrStderr(), "Delete collection "+args[0]+"?"); err != nil {
+			if err := ConfirmDestructive(yes, opts.Stdin, cmd.ErrOrStderr(), "Delete collection "+args[0]+"?"); err != nil {
 				return err
 			}
 			client, err := newAPIClient(opts)

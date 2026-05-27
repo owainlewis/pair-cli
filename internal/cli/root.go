@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/owainlewis/pair-cli/internal/api"
 	"github.com/spf13/cobra"
@@ -14,11 +15,16 @@ type Options struct {
 	BaseURL string
 	Token   string
 	JSON    bool
+	Stdin   io.Reader
 }
 
 // NewRootCommand builds the pair CLI command tree.
 func NewRootCommand() *cobra.Command {
-	opts := &Options{}
+	return newRootCommand(os.Stdin)
+}
+
+func newRootCommand(stdin io.Reader) *cobra.Command {
+	opts := &Options{Stdin: stdin}
 
 	root := &cobra.Command{
 		Use:           "pair",
@@ -45,7 +51,12 @@ func NewRootCommand() *cobra.Command {
 
 // Execute runs the CLI and writes actionable command errors to stderr.
 func Execute(args []string, stdout, stderr io.Writer) int {
-	cmd := NewRootCommand()
+	return ExecuteWithInput(args, os.Stdin, stdout, stderr)
+}
+
+// ExecuteWithInput runs the CLI with explicit standard streams.
+func ExecuteWithInput(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
+	cmd := newRootCommand(stdin)
 	cmd.SetArgs(args)
 	cmd.SetOut(stdout)
 	cmd.SetErr(stderr)

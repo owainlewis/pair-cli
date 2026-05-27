@@ -119,7 +119,7 @@ func newDocsCreateCommand(opts *Options) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			markdown, err := ReadMarkdownInput(body, file, os.Stdin)
+			markdown, err := ReadMarkdownInput(body, file, opts.Stdin)
 			if err != nil {
 				return err
 			}
@@ -149,7 +149,7 @@ func newDocsReplaceCommand(opts *Options) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			markdown, err := ReadMarkdownInput(body, file, os.Stdin)
+			markdown, err := ReadMarkdownInput(body, file, opts.Stdin)
 			if err != nil {
 				return err
 			}
@@ -173,7 +173,7 @@ func newDocsDeleteCommand(opts *Options) *cobra.Command {
 		Short: "Delete a document",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := ConfirmDestructive(yes, os.Stdin, cmd.ErrOrStderr(), "Delete document "+args[0]+"?"); err != nil {
+			if err := ConfirmDestructive(yes, opts.Stdin, cmd.ErrOrStderr(), "Delete document "+args[0]+"?"); err != nil {
 				return err
 			}
 			client, err := newAPIClient(opts)

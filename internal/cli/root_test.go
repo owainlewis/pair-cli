@@ -125,6 +125,6 @@ func executeCommand(args ...string) (string, string, error) {
 func executeCLI(args ...string) (string, string, int) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	code := Execute(args, &stdout, &stderr)
+	code := ExecuteWithInput(args, strings.NewReader(""), &stdout, &stderr)
 	return stdout.String(), stderr.String(), code
 }
