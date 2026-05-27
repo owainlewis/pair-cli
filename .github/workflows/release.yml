@@ -1,0 +1,97 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out tag
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build release archives
+        run: |
+          set -euo pipefail
+
+          version="${GITHUB_REF_NAME}"
+          mkdir -p build dist
+
+          build_archive() {
+            local goos="$1"
+            local goarch="$2"
+            local binary_name="pair-${goos}-${goarch}"
+            local package_name="pair-${version}-${goos}-${goarch}"
+            local package_dir="build/${package_name}"
+
+            if [[ "${goos}" == "windows" ]]; then
+              binary_name="${binary_name}.exe"
+            fi
+
+            mkdir -p "${package_dir}"
+            env CGO_ENABLED=0 GOOS="${goos}" GOARCH="${goarch}" \
+              go build -trimpath -ldflags="-s -w" -o "${package_dir}/${binary_name}" ./cmd/pair
+
+            if [[ "${goos}" == "windows" ]]; then
+              (cd build && zip -qr "../dist/${package_name}.zip" "${package_name}")
+            else
+              tar -C build -czf "dist/${package_name}.tar.gz" "${package_name}"
+            fi
+          }
+
+          build_archive darwin arm64
+          build_archive darwin amd64
+          build_archive linux amd64
+          build_archive windows amd64
+
+      - name: Find previous tag
+        id: release_context
+        run: |
+          set -euo pipefail
+
+          current_commit="$(git rev-list -n 1 "${GITHUB_REF_NAME}")"
+          previous_tag="$(git describe --tags --abbrev=0 "${current_commit}^" 2>/dev/null || true)"
+
+          if [[ -n "${previous_tag}" ]]; then
+            echo "previous_tag=${previous_tag}" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_TAG: ${{ steps.release_context.outputs.previous_tag }}
+        run: |
+          set -euo pipefail
+
+          args=(
+            "${GITHUB_REF_NAME}"
+            dist/*
+            --title "${GITHUB_REF_NAME}"
+            --generate-notes
+            --verify-tag
+          )
+
+          if [[ -n "${PREVIOUS_TAG}" ]]; then
+            args+=(--notes-start-tag "${PREVIOUS_TAG}")
+          fi
+
+          gh release create "${args[@]}"
