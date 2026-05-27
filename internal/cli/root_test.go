@@ -44,7 +44,7 @@ func TestResourceGroupHelpWorks(t *testing.T) {
 func TestGlobalTokenFlagIsNotPrintedByPlaceholder(t *testing.T) {
 	const token = "pair_secret_test_token"
 
-	stdout, stderr, err := executeCommand("--token", token, "tasks", "comment", "task_123")
+	stdout, stderr, err := executeCommand("--token", token, "collections", "list")
 	if err != nil {
 		t.Fatalf("expected placeholder command to succeed: %v", err)
 	}

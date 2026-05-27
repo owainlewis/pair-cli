@@ -87,6 +87,35 @@ func (c Client) DeleteTask(ctx context.Context, id string) error {
 	return c.DoJSON(ctx, http.MethodDelete, taskPath(id), nil, nil)
 }
 
+func (c Client) CommentTask(ctx context.Context, id string, body []byte) (TaskComment, error) {
+	var comment TaskComment
+	err := c.DoJSON(ctx, http.MethodPost, taskPath(id)+"/comments", map[string]string{
+		"body": string(body),
+	}, &comment)
+	return comment, err
+}
+
+func (c Client) LinkTaskDocument(ctx context.Context, taskID, documentID string) (Task, error) {
+	var task Task
+	err := c.DoJSON(ctx, http.MethodPost, taskPath(taskID)+"/documents", map[string]string{
+		"document_id": documentID,
+	}, &task)
+	return task, err
+}
+
+func (c Client) PublishTaskDocument(ctx context.Context, taskID string, body []byte, tags []string) (Task, error) {
+	var task Task
+	err := c.DoJSON(ctx, http.MethodPost, taskPath(taskID)+"/documents", DocumentCreateRequest{
+		Body: string(body),
+		Tags: tags,
+	}, &task)
+	return task, err
+}
+
+func (c Client) UnlinkTaskDocument(ctx context.Context, taskID, documentID string) error {
+	return c.DoJSON(ctx, http.MethodDelete, taskPath(taskID)+"/documents/"+PathEscape(documentID), nil, nil)
+}
+
 func taskPath(id string) string {
 	return fmt.Sprintf("/api/v1/tasks/%s", PathEscape(id))
 }

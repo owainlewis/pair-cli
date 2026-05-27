@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/owainlewis/pair-cli/internal/api"
 	"github.com/owainlewis/pair-cli/internal/output"
@@ -21,13 +22,124 @@ func newTasksCommand(opts *Options) *cobra.Command {
 		newTasksShowCommand(opts),
 		newTasksCreateCommand(opts),
 		newTasksStatusCommand(opts),
-		placeholderCommand("comment <task-id>", "Comment on a task", opts),
-		placeholderCommand("link-doc <task-id> <document-id>", "Link a document to a task", opts),
-		placeholderCommand("publish <task-id>", "Create and link a document to a task", opts),
-		placeholderCommand("unlink-doc <task-id> <document-id>", "Unlink a document from a task", opts),
+		newTasksCommentCommand(opts),
+		newTasksLinkDocCommand(opts),
+		newTasksPublishCommand(opts),
+		newTasksUnlinkDocCommand(opts),
 		newTasksDeleteCommand(opts),
 	)
 
+	return cmd
+}
+
+func newTasksCommentCommand(opts *Options) *cobra.Command {
+	var body string
+	var file string
+
+	cmd := &cobra.Command{
+		Use:   "comment <task-id>",
+		Short: "Comment on a task",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			markdown, err := ReadMarkdownInput(body, file, os.Stdin)
+			if err != nil {
+				return err
+			}
+			if strings.TrimSpace(string(markdown)) == "" {
+				return fmt.Errorf("comment body cannot be blank")
+			}
+			client, err := newAPIClient(opts)
+			if err != nil {
+				return err
+			}
+			comment, err := client.CommentTask(context.Background(), args[0], markdown)
+			if err != nil {
+				return err
+			}
+			if opts.JSON {
+				return output.WriteJSON(cmd.OutOrStdout(), comment)
+			}
+			return output.WriteTable(cmd.OutOrStdout(), []string{"COMMENT", "AUTHOR", "BODY"}, [][]string{{comment.ID, comment.Author, comment.Body}})
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "comment body")
+	cmd.Flags().StringVar(&file, "file", "", "comment file or - for stdin")
+	return cmd
+}
+
+func newTasksLinkDocCommand(opts *Options) *cobra.Command {
+	return &cobra.Command{
+		Use:   "link-doc <task-id> <document-id>",
+		Short: "Link a document to a task",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := newAPIClient(opts)
+			if err != nil {
+				return err
+			}
+			task, err := client.LinkTaskDocument(context.Background(), args[0], args[1])
+			if err != nil {
+				return err
+			}
+			return writeTaskDetail(cmd, opts.JSON, task)
+		},
+	}
+}
+
+func newTasksPublishCommand(opts *Options) *cobra.Command {
+	var body string
+	var file string
+	var tags []string
+
+	cmd := &cobra.Command{
+		Use:   "publish <task-id>",
+		Short: "Create and link a document to a task",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			markdown, err := ReadMarkdownInput(body, file, os.Stdin)
+			if err != nil {
+				return err
+			}
+			client, err := newAPIClient(opts)
+			if err != nil {
+				return err
+			}
+			task, err := client.PublishTaskDocument(context.Background(), args[0], markdown, tags)
+			if err != nil {
+				return err
+			}
+			return writeTaskDetail(cmd, opts.JSON, task)
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "document markdown body")
+	cmd.Flags().StringVar(&file, "file", "", "document markdown file or - for stdin")
+	cmd.Flags().StringArrayVar(&tags, "tag", nil, "document tag")
+	return cmd
+}
+
+func newTasksUnlinkDocCommand(opts *Options) *cobra.Command {
+	var yes bool
+
+	cmd := &cobra.Command{
+		Use:   "unlink-doc <task-id> <document-id>",
+		Short: "Unlink a document from a task",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := ConfirmDestructive(yes, os.Stdin, cmd.ErrOrStderr(), "Unlink document "+args[1]+" from task "+args[0]+"?"); err != nil {
+				return err
+			}
+			client, err := newAPIClient(opts)
+			if err != nil {
+				return err
+			}
+			if err := client.UnlinkTaskDocument(context.Background(), args[0], args[1]); err != nil {
+				return err
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "document unlinked")
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&yes, "yes", false, "confirm unlink")
 	return cmd
 }
 
