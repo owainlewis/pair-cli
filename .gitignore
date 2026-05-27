@@ -27,6 +27,9 @@ go.work.sum
 # env file
 .env
 
+# Local CLI build artifact
+/pair
+
 # Editor/IDE
 # .idea/
 # .vscode/
