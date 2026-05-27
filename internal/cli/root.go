@@ -41,6 +41,21 @@ func NewRootCommand() *cobra.Command {
 	return root
 }
 
+// Execute runs the CLI and writes actionable command errors to stderr.
+func Execute(args []string, stdout, stderr io.Writer) int {
+	cmd := NewRootCommand()
+	cmd.SetArgs(args)
+	cmd.SetOut(stdout)
+	cmd.SetErr(stderr)
+
+	if err := cmd.Execute(); err != nil {
+		fmt.Fprintln(stderr, err)
+		return 1
+	}
+
+	return 0
+}
+
 func placeholderCommand(use, short string, opts *Options) *cobra.Command {
 	return &cobra.Command{
 		Use:   use,

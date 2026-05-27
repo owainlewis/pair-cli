@@ -6,7 +6,7 @@ Build `pair`, a single-binary Go CLI for AI agents and humans to operate a PAIR 
 
 ## Context
 
-The PAIR web app lives at `/Users/owainlewis/Code/github/owainlewis/pair`. It is a Rails app for agent-native markdown writing and task management. The current API is defined in `app/controllers/api/v1/*`, with behavior covered by `test/integration/api/*`.
+The PAIR web app lives in the companion `owainlewis/pair` Rails repo. It is a Rails app for agent-native markdown writing and task management. The current API is defined in `app/controllers/api/v1/*`, with behavior covered by `test/integration/api/*`.
 
 Relevant existing contracts:
 
@@ -17,7 +17,7 @@ Relevant existing contracts:
 - Tasks use fixed statuses: `todo`, `doing`, `review`, `done`.
 - Agents can create task comments and can link documents to tasks or collections by either existing document ID or a new markdown body.
 
-The current `pair-cli` repo at `/Users/owainlewis/Code/github/owainlewis/pair-cli` is initialized with a README and Go `.gitignore`, but no Go source yet.
+This `pair-cli` repo is initialized with a README and Go `.gitignore`, but no Go source yet.
 
 ## Requirements
 

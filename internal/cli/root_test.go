@@ -54,6 +54,24 @@ func TestGlobalTokenFlagIsNotPrintedByPlaceholder(t *testing.T) {
 	}
 }
 
+func TestExecutePrintsCommandErrorsWithoutToken(t *testing.T) {
+	const token = "pair_secret_test_token"
+
+	stdout, stderr, code := executeCLI("--token", token, "unknown")
+	if code == 0 {
+		t.Fatal("expected unknown command to fail")
+	}
+	if stdout != "" {
+		t.Fatalf("expected no stdout, got %q", stdout)
+	}
+	if !strings.Contains(stderr, "unknown command") {
+		t.Fatalf("expected stderr to explain the command error, got %q", stderr)
+	}
+	if strings.Contains(stderr, token) {
+		t.Fatalf("expected token to be redacted from stderr, got %q", stderr)
+	}
+}
+
 func executeCommand(args ...string) (string, string, error) {
 	cmd := NewRootCommand()
 	var stdout bytes.Buffer
@@ -63,4 +81,11 @@ func executeCommand(args ...string) (string, string, error) {
 	cmd.SetArgs(args)
 	err := cmd.Execute()
 	return stdout.String(), stderr.String(), err
+}
+
+func executeCLI(args ...string) (string, string, int) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Execute(args, &stdout, &stderr)
+	return stdout.String(), stderr.String(), code
 }

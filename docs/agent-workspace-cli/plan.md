@@ -114,8 +114,8 @@ Every resource command depends on a consistent HTTP layer that attaches bearer a
 ### Relevant files or references
 
 - `docs/agent-workspace-cli/spec.md`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/base_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/contents_controller.rb`
+- `pair/app/controllers/api/v1/base_controller.rb`
+- `pair/app/controllers/api/v1/contents_controller.rb`
 - `internal/api`
 
 ### Proposed approach
@@ -203,10 +203,10 @@ Documents are the core PAIR primitive. Metadata is JSON, but content is raw mark
 ### Relevant files or references
 
 - `docs/agent-workspace-cli/spec.md`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/documents_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/contents_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/documents_api_test.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/content_api_test.rb`
+- `pair/app/controllers/api/v1/documents_controller.rb`
+- `pair/app/controllers/api/v1/contents_controller.rb`
+- `pair/test/integration/api/documents_api_test.rb`
+- `pair/test/integration/api/content_api_test.rb`
 
 ### Proposed approach
 
@@ -250,9 +250,9 @@ PAIR tasks are the board items agents operate. The CLI should make it easy to in
 ### Relevant files or references
 
 - `docs/agent-workspace-cli/spec.md`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/tasks_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/models/task.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/tasks_api_test.rb`
+- `pair/app/controllers/api/v1/tasks_controller.rb`
+- `pair/app/models/task.rb`
+- `pair/test/integration/api/tasks_api_test.rb`
 
 ### Proposed approach
 
@@ -296,9 +296,9 @@ The PAIR API has explicit agent paths for task comments and task-produced resour
 ### Relevant files or references
 
 - `docs/agent-workspace-cli/spec.md`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/task_comments_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/task_documents_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/tasks_api_test.rb`
+- `pair/app/controllers/api/v1/task_comments_controller.rb`
+- `pair/app/controllers/api/v1/task_documents_controller.rb`
+- `pair/test/integration/api/tasks_api_test.rb`
 
 ### Proposed approach
 
@@ -340,10 +340,10 @@ PAIR collections are ordered bundles of documents. Agents need to publish multi-
 ### Relevant files or references
 
 - `docs/agent-workspace-cli/spec.md`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/collections_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/app/controllers/api/v1/collection_documents_controller.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/collections_api_test.rb`
-- `/Users/owainlewis/Code/github/owainlewis/pair/test/integration/api/collection_documents_api_test.rb`
+- `pair/app/controllers/api/v1/collections_controller.rb`
+- `pair/app/controllers/api/v1/collection_documents_controller.rb`
+- `pair/test/integration/api/collections_api_test.rb`
+- `pair/test/integration/api/collection_documents_api_test.rb`
 
 ### Proposed approach
 
