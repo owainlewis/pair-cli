@@ -72,6 +72,45 @@ func TestExecutePrintsCommandErrorsWithoutToken(t *testing.T) {
 	}
 }
 
+func TestAuthStatusDoesNotPrintToken(t *testing.T) {
+	const token = "pair_secret_test_token"
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("PAIR_BASE_URL", "http://localhost:3000")
+	t.Setenv("PAIR_TOKEN", token)
+
+	stdout, stderr, code := executeCLI("auth", "status")
+	if code != 0 {
+		t.Fatalf("expected auth status to succeed, got code %d stderr %q", code, stderr)
+	}
+	combined := stdout + stderr
+	if !strings.Contains(stdout, "base URL: configured") {
+		t.Fatalf("expected configured base URL, got %q", stdout)
+	}
+	if !strings.Contains(stdout, "token: configured") {
+		t.Fatalf("expected configured token, got %q", stdout)
+	}
+	if strings.Contains(combined, token) {
+		t.Fatalf("expected token to be redacted from output, got %q", combined)
+	}
+}
+
+func TestConfigSetTokenDoesNotEchoToken(t *testing.T) {
+	const token = "pair_secret_test_token"
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	stdout, stderr, code := executeCLI("config", "set", "token", token)
+	if code != 0 {
+		t.Fatalf("expected config set token to succeed, got code %d stderr %q", code, stderr)
+	}
+	combined := stdout + stderr
+	if strings.Contains(combined, token) {
+		t.Fatalf("expected token to be redacted from output, got %q", combined)
+	}
+	if !strings.Contains(stdout, "token saved") {
+		t.Fatalf("expected save confirmation, got %q", stdout)
+	}
+}
+
 func executeCommand(args ...string) (string, string, error) {
 	cmd := NewRootCommand()
 	var stdout bytes.Buffer
