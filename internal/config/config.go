@@ -11,6 +11,10 @@ import (
 const (
 	EnvBaseURL = "PAIR_BASE_URL"
 	EnvToken   = "PAIR_TOKEN"
+
+	// DefaultBaseURL is used when no flag, env var, or config file sets one.
+	// Overrides exist for pointing at a dev/staging backend.
+	DefaultBaseURL = "https://usepair.ai/"
 )
 
 // Config stores PAIR CLI settings.
@@ -29,10 +33,11 @@ type Overrides struct {
 type Source string
 
 const (
-	SourceUnset Source = "unset"
-	SourceFlag  Source = "flag"
-	SourceEnv   Source = "env"
-	SourceFile  Source = "file"
+	SourceUnset   Source = "unset"
+	SourceFlag    Source = "flag"
+	SourceEnv     Source = "env"
+	SourceFile    Source = "file"
+	SourceDefault Source = "default"
 )
 
 // Resolved is a config value plus source metadata for status output and tests.
@@ -132,6 +137,12 @@ func Resolve(overrides Overrides) (Resolved, error) {
 	if overrides.Token != "" {
 		resolved.Token = overrides.Token
 		resolved.TokenSource = SourceFlag
+	}
+
+	// Fall back to the production backend when nothing else is configured.
+	if resolved.BaseURL == "" {
+		resolved.BaseURL = DefaultBaseURL
+		resolved.BaseURLSource = SourceDefault
 	}
 
 	return resolved, nil

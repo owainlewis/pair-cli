@@ -58,6 +58,19 @@ func TestResolveUsesEnvBeforeFile(t *testing.T) {
 	}
 }
 
+func TestResolveDefaultsBaseURL(t *testing.T) {
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+	resolved, err := Resolve(Overrides{})
+	if err != nil {
+		t.Fatalf("Resolve() error = %v", err)
+	}
+
+	if resolved.BaseURL != DefaultBaseURL || resolved.BaseURLSource != SourceDefault {
+		t.Fatalf("expected default base URL, got %#v", resolved)
+	}
+}
+
 func TestSaveWritesOwnerOnlyFile(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "pair", "config.json")
 	if err := Save(path, Config{Token: "pair_secret"}); err != nil {
