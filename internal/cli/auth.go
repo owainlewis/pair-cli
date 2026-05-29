@@ -26,7 +26,9 @@ func newAuthCommand(opts *Options) *cobra.Command {
 				return err
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "base URL: %s (%s)\n", configuredLabel(resolved.BaseURL), resolved.BaseURLSource)
+			// The base URL is not a secret, so show its value to confirm
+			// which backend (prod default vs. dev override) is in effect.
+			fmt.Fprintf(cmd.OutOrStdout(), "base URL: %s (%s)\n", resolved.BaseURL, resolved.BaseURLSource)
 			fmt.Fprintf(cmd.OutOrStdout(), "token: %s (%s)\n", configuredLabel(resolved.Token), resolved.TokenSource)
 			return nil
 		},

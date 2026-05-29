@@ -72,18 +72,3 @@ func ExecuteWithInput(args []string, stdin io.Reader, stdout, stderr io.Writer) 
 
 	return 0
 }
-
-func placeholderCommand(use, short string, opts *Options) *cobra.Command {
-	return &cobra.Command{
-		Use:   use,
-		Short: short,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			printPlaceholder(cmd.OutOrStdout(), cmd.CommandPath())
-			return nil
-		},
-	}
-}
-
-func printPlaceholder(w io.Writer, commandPath string) {
-	fmt.Fprintf(w, "%s is not implemented yet.\n", commandPath)
-}

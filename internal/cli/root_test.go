@@ -83,8 +83,8 @@ func TestAuthStatusDoesNotPrintToken(t *testing.T) {
 		t.Fatalf("expected auth status to succeed, got code %d stderr %q", code, stderr)
 	}
 	combined := stdout + stderr
-	if !strings.Contains(stdout, "base URL: configured") {
-		t.Fatalf("expected configured base URL, got %q", stdout)
+	if !strings.Contains(stdout, "base URL: http://localhost:3000 (env)") {
+		t.Fatalf("expected base URL value and source, got %q", stdout)
 	}
 	if !strings.Contains(stdout, "token: configured") {
 		t.Fatalf("expected configured token, got %q", stdout)
