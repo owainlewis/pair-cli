@@ -111,6 +111,16 @@ func TestConfigSetTokenDoesNotEchoToken(t *testing.T) {
 	}
 }
 
+func TestVersionCommandPrintsVersion(t *testing.T) {
+	stdout, stderr, code := executeCLI("version")
+	if code != 0 {
+		t.Fatalf("expected version to succeed, got code %d stderr %q", code, stderr)
+	}
+	if !strings.HasPrefix(stdout, "pair ") {
+		t.Fatalf("expected output to start with \"pair \", got %q", stdout)
+	}
+}
+
 func executeCommand(args ...string) (string, string, error) {
 	cmd := NewRootCommand()
 	var stdout bytes.Buffer

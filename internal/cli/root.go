@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/owainlewis/pair-cli/internal/api"
+	"github.com/owainlewis/pair-cli/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +33,16 @@ func newRootCommand(stdin io.Reader) *cobra.Command {
 		Long:          "pair is a CLI for AI agents and humans to operate a PAIR workspace from a terminal.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Version:       version.String(),
 	}
+	root.SetVersionTemplate("pair {{.Version}}\n")
 
 	root.PersistentFlags().StringVar(&opts.BaseURL, "base-url", "", "PAIR API base URL")
 	root.PersistentFlags().StringVar(&opts.Token, "token", "", "PAIR bearer token")
 	root.PersistentFlags().BoolVar(&opts.JSON, "json", false, "print machine-readable JSON")
 
 	root.AddCommand(
+		newVersionCommand(),
 		newAuthCommand(opts),
 		newConfigCommand(opts),
 		newTasksCommand(opts),
@@ -47,6 +51,18 @@ func newRootCommand(stdin io.Reader) *cobra.Command {
 	)
 
 	return root
+}
+
+func newVersionCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print the pair version",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Fprintf(cmd.OutOrStdout(), "pair %s\n", version.String())
+			return nil
+		},
+	}
 }
 
 // Execute runs the CLI and writes actionable command errors to stderr.
