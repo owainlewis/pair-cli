@@ -63,6 +63,12 @@ jobs:
           build_archive linux amd64
           build_archive windows amd64
 
+          # Checksums for the installer to verify downloads against.
+          # Bare filenames (generated from within dist/) so the entries
+          # match the asset names the installer looks up. Glob the archives
+          # explicitly so SHA256SUMS does not list itself.
+          (cd dist && sha256sum -- *.tar.gz *.zip > SHA256SUMS)
+
       - name: Find previous tag
         id: release_context
         run: |
