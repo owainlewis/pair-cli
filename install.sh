@@ -92,8 +92,12 @@ resolve_version() {
   [ "$VERSION" != "latest" ] && return
 
   local api="https://api.github.com/repos/${REPO}/releases/latest"
-  local tag
-  tag="$(curl -fsSL "$api" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name" *: *"([^"]+)".*/\1/')"
+  local body tag
+  # Capture the full response first. Piping curl directly into `grep -m1`
+  # makes grep close the pipe early, which trips curl ("failed writing body")
+  # and, under pipefail, aborts the install.
+  body="$(curl -fsSL "$api")" || err "could not query GitHub for the latest release."
+  tag="$(printf '%s\n' "$body" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name" *: *"([^"]+)".*/\1/')"
   [ -n "$tag" ] || err "could not determine latest release tag from GitHub."
   VERSION="$tag"
 }
